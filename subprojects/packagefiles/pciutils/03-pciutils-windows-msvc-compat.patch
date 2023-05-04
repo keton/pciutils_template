@@ -1,0 +1,94 @@
+diff --git a/common.c b/common.c
+index 8ea52fa..148df72 100644
+--- a/common.c
++++ b/common.c
+@@ -10,7 +10,10 @@
+ #include <string.h>
+ #include <stdlib.h>
+ #include <stdarg.h>
++
++#ifndef _MSC_VER
+ #include <unistd.h>
++#endif
+
+ #include "pciutils.h"
+
+diff --git a/lib/i386-io-windows.h b/lib/i386-io-windows.h
+index 74055ca..6979fc7 100644
+--- a/lib/i386-io-windows.h
++++ b/lib/i386-io-windows.h
+@@ -55,7 +55,7 @@ intel_setup_io(struct pci_access *a)
+ {
+   HMODULE lib;
+
+-  SETDLLDIRECTORY fnSetDllDirectory;
++  FARPROC fnSetDllDirectory;
+
+   /* remove current directory from DLL search path */
+   fnSetDllDirectory = GetProcAddress(GetModuleHandle("kernel32"), "SetDllDirectoryA");
+diff --git a/lib/i386-ports.c b/lib/i386-ports.c
+index 421bbfd..2c48002 100644
+--- a/lib/i386-ports.c
++++ b/lib/i386-ports.c
+@@ -10,7 +10,9 @@
+
+ #include "internal.h"
+
++#ifndef _MSC_VER
+ #include <unistd.h>
++#endif
+
+ #if defined(PCI_OS_LINUX)
+ #include "i386-io-linux.h"
+diff --git a/lib/sysdep.h b/lib/sysdep.h
+index b864e90..758f3ac 100644
+--- a/lib/sysdep.h
++++ b/lib/sysdep.h
+@@ -19,8 +19,13 @@ typedef u8 byte;
+ typedef u16 word;
+
+ #ifdef PCI_OS_WINDOWS
++#ifdef _MSC_VER
++#define strncasecmp _strnicmp
++#define strcasecmp _stricmp
++#else
+ #define strcasecmp strcmpi
+ #endif
++#endif
+
+ #ifdef PCI_HAVE_LINUX_BYTEORDER_H
+
+diff --git a/lib/types.h b/lib/types.h
+index 7011252..44cdf50 100644
+--- a/lib/types.h
++++ b/lib/types.h
+@@ -11,8 +11,13 @@
+ #ifndef PCI_HAVE_Uxx_TYPES
+
+ #ifdef PCI_OS_WINDOWS
+-/* On Windows compilers, use <windef.h> */
++
++#ifdef _MSC_VER
++#include <windows.h>
++#else
+ #include <windef.h>
++#endif
++
+ typedef BYTE u8;
+ typedef WORD u16;
+ typedef DWORD u32;
+diff --git a/ls-kernel.c b/ls-kernel.c
+index ecacd0e..6559746 100644
+--- a/ls-kernel.c
++++ b/ls-kernel.c
+@@ -8,7 +8,10 @@
+
+ #include <stdio.h>
+ #include <string.h>
++
++#ifndef _MSC_VER
+ #include <unistd.h>
++#endif
+
+ #include "lspci.h"
+
