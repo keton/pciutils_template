@@ -1,5 +1,5 @@
 project('pciutils', 'c',
-  version : '0.1',
+  version : run_command('git', 'describe', '--tags', check: true).stdout().strip().replace('v',''),
   default_options : ['warning_level=2', 'c_std=c17'])
 
 compile_args = meson.get_compiler('c').get_supported_arguments(
@@ -9,12 +9,22 @@ compile_args = meson.get_compiler('c').get_supported_arguments(
   '/wd4098', # 'void' function returning a value
 )
 
-compile_args += ['-DWIN32=1', '-DWIN64=1', '-DPCI_COMPRESSED_IDS=1','-DPCI_HAVE_64BIT_ADDRESS=1', '-D_CRT_SECURE_NO_WARNINGS']
-
-inc_dirs = [
-	include_directories('lib'),
-	include_directories('win32'),
+compile_args += [
+	'-DWIN32=1',
+	'-DWIN64=1',
+	'-DPCI_CONFIG_H=1',
+	'-DPCI_COMPRESSED_IDS=1',
+	'-DPCI_HAVE_64BIT_ADDRESS=1',
+	'-D_CRT_SECURE_NO_WARNINGS',
+	'-DPCI_ARCH_I386',
+	'-DPCI_OS_WINDOWS',
+	'-DPCI_HAVE_PM_INTEL_CONF',
+	'-DPCI_IDS="pci.ids.gz"',
+	'-DPCI_PATH_IDS_DIR=""',
+	'-DPCILIB_VERSION="@0@"'.format(meson.project_version()),
 ]
+
+inc_dirs = include_directories('lib')
 
 src_files = [
 	'lib/init.c',
@@ -43,7 +53,7 @@ deps = [
 fs = import('fs')
 
 dist_includes = [
-	fs.copyfile('win32/config.h')[0],
+	fs.copyfile('config.h')[0],
 	fs.copyfile('lib/pci.h')[0],
 	fs.copyfile('lib/header.h')[0],
 	fs.copyfile('lib/types.h')[0],
