@@ -1,11 +1,12 @@
 src_files = [
-    'example.c',
-    program_icon,
+    'main.c',
+	'rc_manager.c',
+    program_rc,
 ]
 
 inc_dirs = include_directories('.')
 
-pciutils_dep = dependency('pciutils', fallback : ['pciutils', 'pciutils_dep'])
+pciutils_dep = dependency('pciutils', required: true)
 
 deps = [
 	pciutils_dep,
