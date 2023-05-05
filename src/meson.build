@@ -12,4 +12,10 @@ deps = [
 	pciutils_dep,
 ]
 
-executable(meson.project_name(), src_files, include_directories: inc_dirs, dependencies: deps, win_subsystem:'console')
+# run executable as administrator
+link_args = [
+	'/MANIFEST:EMBED',
+	'/MANIFESTUAC:level=\'requireAdministrator\'',
+]
+
+executable(meson.project_name(), src_files, include_directories: inc_dirs, dependencies: deps, win_subsystem:'console', link_args: link_args)
